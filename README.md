@@ -10,10 +10,10 @@ This repo contains the Lean formalization files for the paper "Finiteness of Sym
 ## Brief file overview
 Listed below is a brief description of each file of the formalization.
 
-- `Evaluation` : contains the definition of the `evaluation` function for concrete locations. Here, we prove that symbolic derivatives preserve match semantics. 
-- `Finite` : contains the main finiteness result.
+- `Evaluation` : contains the definition of the `evaluation` function for concrete locations. Here, we prove that symbolic derivatives are equivalent to the classical derivative definition and thus preserve match semantics. 
+- `Finite` : contains the main `finiteness` theorem.
 - `NeSublists` : contains definitions and lemmas about non-empty sublists.
-- `Permute` : contains definitions and lemmas about the key functions `sum`, `neSubsets`, and `sumSubsets`.
+- `Permute` : contains definitions and lemmas about the key functions `sum`, non-empty subsets `neSubsets`, and `sumSubsets`.
 - `Pieces` : contains the definitions and lemmas about `pieces` and also `piecesS` (`pieces` as a closure operator).
 - `Similarity` : contains the definition of the similarity relation.
 - `Simplifications` : contains admissible simplifications which preserve the finiteness result.
