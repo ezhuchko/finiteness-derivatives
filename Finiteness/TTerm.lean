@@ -47,10 +47,12 @@ theorem TTerm.fmap_id (b : TTerm α β) : fmap id b = b :=
 
 @[simp]
 theorem TTerm.fmap_compose (f : β → γ) (g : γ → δ) (b : TTerm α β) :
-  fmap g (fmap f b) = fmap g (fmap f b) :=
+  fmap (g ∘ f) b = fmap g (fmap f b) :=
   match b with
   | Leaf b => rfl
-  | Node p a b => by simp only [fmap]
+  | Node p a b => by
+    simp only [fmap]
+    rw[TTerm.fmap_compose f g a, TTerm.fmap_compose f g b]
 
 /-- Bind operation for `TTerm`, replacing leaves with new `TTerm`s. -/
 @[simp]
