@@ -440,55 +440,6 @@ theorem mult_eps_r_ni :
 def NonIncreasing_simps' [DecidableEq α] : RE α → RE α :=
   mult_eps_r ∘ inter_not_bot_l ∘ inter_not_bot_r ∘ double_neg ∘ NonIncreasing_simps ∘ mult_bot_l ∘ inter_bot_l ∘ inter_bot_r
 
--- theorem distr'_ni :
---   Nonincreasing' (α := α) distr := fun r r1 h =>
---   match r with
---   | ε | Pred ψ | ?=_ | ?!_ | ?<=_ | ?<!_ | .Star _ | _⋒_ | _⋓_ | ~_ => h
---   | (l ⋓ r) ⬝ g  => by
---     simp[pieces'] at h
---     match h with
---     | Or.inl ⟨a1,a2,eq⟩ =>
---       subst eq
---       simp only [pieces', mem_append, mem_map, Concatenation.injEq, and_true, exists_eq_right]
---       exact Or.inl (Or.inl (toSum_appendL a2))
---     | Or.inr g' =>
---       match g' with
---       | Or.inl a1 => unfold pieces'; simp; exact Or.inr $ Or.inl a1
---       | Or.inr g1 =>
---         simp[pieces']
---         match g1 with
---         | Or.inl g2 => exact Or.inr $ Or.inr $ Or.inl g2
---         | Or.inr g2 =>
---           match g2 with
---           | Or.inl ⟨a1,a2,eq⟩ => subst eq; exact Or.inl ⟨a1,toSum_appendR a2,rfl⟩
---           | Or.inr g3 => exact Or.inr (by aesop)
---   | l ⬝ g =>
---     match l with
---     | l1 ⋓ l2 => by
---       simp only [distr, pieces', append_assoc, mem_append, mem_map] at h
---       match h with
---       | Or.inl ⟨a1,a2,a3⟩ =>
---         subst a3
---         simp only [pieces', mem_append, mem_map, Concatenation.injEq, and_true, exists_eq_right]
---         exact Or.inl $ Or.inl (toSum_appendL a2)
---       | Or.inr g1 =>
---         match g1 with
---         | Or.inl g2 =>
---           unfold pieces'
---           simp only [mem_append, mem_map]
---           exact Or.inl $ Or.inr g2
---         | Or.inr g2 =>
---           simp only [pieces', mem_append, mem_map]
---           sorry
---     | ε | Pred ψ | ?=_ | ?!_ | ?<=_ | ?<!_ | .Star _ | _⬝_ | _⋒_ | ~_ => h
-
--- def NonIncreasing_simps'_proof [DecidableEq α] :
---   NonIncreasing (α := α) NonIncreasing_simps' := fun r _ h =>
---   have step0 : Nonincreasing' (α:=α) (mult_eps_r ∘ inter_not_bot_l ∘ inter_not_bot_r ∘ double_neg ∘ NonIncreasing_simps' ∘ mult_bot_l ∘ inter_bot_l) :=
---     Nonincreasing'_comp (Nonincreasing'_comp (Nonincreasing'_comp (Nonincreasing'_comp (Nonincreasing'_comp (Nonincreasing'_comp inter_bot_l_ni mult_bot_l_ni) sorry) double_neg_ni) inter_not_bot_r_ni) inter_not_bot_l_ni) mult_eps_r_ni
---   have step := Nonincreasing'_comp (g:= mult_eps_r ∘ inter_not_bot_l ∘ inter_not_bot_r ∘ double_neg ∘ NonIncreasing_simps' ∘ mult_bot_l ∘ inter_bot_l ∘ inter_bot_r) (r:=r) distr'_ni step0
---   step h
-
 def step_with_simp' [DecidableEq α] (r : RE α) : List (RE α) :=
   map (simplify NonIncreasing_simps') (step r)
 
@@ -496,31 +447,3 @@ def step_with_simp' [DecidableEq α] (r : RE α) : List (RE α) :=
 def steps_with_simp' [DecidableEq α] (r : RE α) : ℕ → List (RE α)
   | 0 => [r]
   | Nat.succ n => map step_with_simp' (steps_with_simp' r n) |> flatten
-
--- theorem fin_step_with_simp' [DecidableEq α] {r : RE α} :
---   step_with_simp' r ⊆[ (· ≅ ·) ] ⊕(pieces r) := fun e1 in_step => by
---   simp only [step_with_simp', mem_map] at in_step
---   let ⟨a1,a2,a3⟩ := in_step
---   subst a3
---   have ⟨p1,p2,p3⟩ := pieces_refl (r:=simplify NonIncreasing_simps' a1)
---   have ⟨m1,m2,m3⟩ : toSum p1 ∈[ (· ≅ ·) ] ⊕((pieces (simplify NonIncreasing_simps' a1))) :=
---     ⟨toSum p1, Rfl, by simp[toSumSubsets]; exact ⟨p1,p2,⟨p1,Perm.refl _,rfl⟩⟩⟩
---   -- have inter_step := toSumSubsets_monotone $ NonIncreasing_pieces (r:=a1) sorry -- NonIncreasing_simps'_proof
---   -- have ⟨o1,o2,o3⟩ := toSumSubsets_pieces_trans (inter_step _ m3) (step_to_toSumSubsets _ a2)
---   -- exists o1; exists Sim.Trans (Sim.Trans (Sym p3) m2) o2
---   sorry
-
--- theorem finiteness_simp' [DecidableEq α] {r : RE α} :
---   steps_with_simp' r n ⊆[ (· ≅ ·) ] ⊕(pieces r) := fun e1 h =>
---   match n with
---   | 0 => by
---     simp only [steps_with_simp', mem_cons, not_mem_nil, or_false] at h
---     subst h; exact toSumSubsets_pieces_refl
---   | Nat.succ n => by
---     simp at h
---     let ⟨e2,e2_steps_n,e1_step_e2⟩ := h
---     have ⟨q1,q1_eqv,ih⟩ := finiteness_simp' _ e2_steps_n
---     have ⟨xs,xs_eqv,hxs⟩ := fin_step_with_simp' _ e1_step_e2
---     have e2_in : e2 ∈[ (· ≅ ·) ] ⊕(pieces r) := ⟨q1,q1_eqv,ih⟩
---     have e_in  : e1 ∈[ (· ≅ ·) ] ⊕(pieces e2) := ⟨xs,xs_eqv,hxs⟩
---     exact toSumSubsets_pieces_trans e_in e2_in
