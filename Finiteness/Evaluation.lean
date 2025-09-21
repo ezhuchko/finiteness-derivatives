@@ -66,10 +66,10 @@ theorem liftB (op : β → β → β) (f g : TTerm (RE α) β) (x : Loc σ) :
   | Node p ff gg, Node p1 ff1 gg1 => by
     match g2:null p x with
     | true  =>
-      simp only [evaluation, g2, lift_binary, fmap, TTerm.bind, TTerm.pure, lift_unary, join]
+      simp only [evaluation, g2, lift_binary, fmap, TTerm.bind, lift_unary, join]
       exact liftB op ff (Node p1 ff1 gg1) x -- inductive hypothesis
     | false =>
-      simp only [evaluation, g2, lift_binary, fmap, TTerm.bind, TTerm.pure, lift_unary, join]
+      simp only [evaluation, g2, lift_binary, fmap, TTerm.bind, lift_unary, join]
       exact liftB op gg (Node p1 ff1 gg1) x -- inductive hypothesis
 
 /- The equivalence between the classical definition of location based derivatives
@@ -103,7 +103,7 @@ theorem equivalence (r : RE α) (x : Loc σ) :
     simp only [lookaround_height, der]
     simp only [equivalence l x, equivalence r x, derivative] -- inductive hypothesis
     exact Eq.symm $ liftB Intersection (derivative l) (derivative r) x
-  | r *       => by
+  | .Star r   => by
     simp only [lookaround_height, der, derivative]
     rw[equivalence r x] -- inductive hypothesis
     exact Eq.symm $ liftU (· ⬝ r*) (derivative r) x
@@ -115,7 +115,7 @@ theorem equivalence (r : RE α) (x : Loc σ) :
     unfold der
     by_cases h : null l x
     . simp only [lookaround_height, derivative, evaluation]
-      simp only [lookaround_height, h, ↓reduceIte, equivalence l x, equivalence r x, evaluation] -- inductive hypothesis
+      simp only [h, ↓reduceIte, equivalence l x, equivalence r x] -- inductive hypothesis
       rw[←(liftU (· ⬝ r) (derivative l) x),
          ←(liftB Alternation ((lift_unary (· ⬝ r) (derivative l))) (derivative r) x)]
     . simp only [lookaround_height, derivative, evaluation, h]

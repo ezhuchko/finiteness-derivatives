@@ -21,7 +21,7 @@ theorem neSublists_completeness :
   match h with
   | Sublist.slnil => False.elim (ne rfl)
   | Sublist.cons a h1 => by
-    simp only [neSublists, singleton_append, cons_append, mem_cons, mem_append, mem_map]
+    simp only [neSublists, cons_append, mem_cons, mem_append, mem_map]
     exact Or.inr $ Or.inr (neSublists_completeness ⟨h1, ne⟩)
   | @Sublist.cons₂ _ l1 l2 a h1 => by
     match l1 with
@@ -48,7 +48,7 @@ theorem neSublists_correctness :
       match h1 with
       | Or.inl ⟨g1,g2,g3⟩ =>
         subst g3
-        simp only [cons_sublist_cons, ne_eq, not_false_eq_true, and_true]
+        simp only [cons_sublist_cons, ne_eq]
         exact ⟨(neSublists_correctness g2).1, cons_ne_nil y g1⟩
       | Or.inr h2 =>
         exact ⟨Sublist.cons y (neSublists_correctness h2).1,(neSublists_correctness h2).2⟩

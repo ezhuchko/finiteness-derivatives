@@ -29,22 +29,19 @@ prefix:max "⊕" => toSumSubsets
 
 theorem neSubsets_ne (h : xs ∈ neSubsets ys) : xs ≠ [] := fun xs_empty => by
   subst xs_empty
-  unfold neSubsets at h
-  simp only [mem_flatten, mem_map, exists_exists_and_eq_and] at h
+  simp only [neSubsets, mem_flatten, mem_map, exists_exists_and_eq_and] at h
   let ⟨xs,xs_sub,xs_perm⟩ := h
   exact (neSub_ne xs_sub) (nil_perm.mp $ mem_permutations'.mp xs_perm)
 
 theorem neSubsets_refl (ne : xs ≠ []) :
   xs ∈ neSubsets xs := by
-  unfold neSubsets
-  simp only [mem_flatten, mem_map, exists_exists_and_eq_and]
+  simp only [neSubsets, mem_flatten, mem_map, exists_exists_and_eq_and]
   exact ⟨xs,neSublists_characterization.mpr ⟨Sublist.refl xs,ne⟩,mem_permutations'.mpr (Perm.refl xs)⟩
 
 @[simp]
 theorem neSubsets_characterization :
   xs ∈ neSubsets ys ↔ ∃ zs, zs ∈ neSublists ys ∧ xs ~ zs := by
-  unfold neSubsets
-  simp only [mem_flatten, mem_map, exists_exists_and_eq_and, mem_permutations']
+  simp only [neSubsets, mem_flatten, mem_map, exists_exists_and_eq_and, mem_permutations']
 
 theorem neSublist_neSubset (h : xs ∈ neSublists ys) : xs ∈ neSubsets ys :=
   neSubsets_characterization.mpr ⟨xs,h,Perm.refl _⟩
@@ -78,7 +75,7 @@ theorem neSubsets_singleton (h : x ∈ xs) : [x] ∈ neSubsets xs :=
   | [] => False.elim ((mem_nil_iff x).mp h)
   | _::_ =>
    match mem_cons.mp h with
-   | Or.inl h1 => by subst h1; exact mem_of_mem_head? rfl
+   | Or.inl h1 => mem_of_mem_head? (by subst h1; rfl)
    | Or.inr h1 => neSubsets_extend (neSubsets_singleton h1)
 
 theorem toSum_append {xs ys : List (RE α)} (_ : xs ≠ []) (h1 : ys ≠ []) :
@@ -132,7 +129,7 @@ theorem perms_erase_helper [DecidableEq α] {y : α}
     match mem_cons.mp h1 with
     | Or.inl h2 =>
       subst h2
-      simp only [erase_cons_head, permutations'Aux, mem_cons, mem_map, exists_eq_right_right, true_or]
+      simp only [erase_cons_head, permutations'Aux, mem_cons, mem_map, true_or]
     | Or.inr h2 =>
       unfold List.erase
       by_cases g : x1 == y
@@ -267,7 +264,10 @@ theorem subset_sim_toSum {xs ys : List (RE α)}
 theorem nodup_swap (h : (z1 ++ x :: z2).Nodup) : (x :: z1 ++ z2).Nodup := by
   have ⟨h1,h2,h3⟩ := List.nodup_append.mp h
   apply List.nodup_append.mpr
-  simp_all only [nodup_cons, disjoint_cons_right, not_false_eq_true, and_self, disjoint_cons_left]
+  simp_all
+  let ⟨h2a,h2b⟩ := h2
+  exact ⟨fun eq => by have ⟨a1,a2⟩ := h3 _ eq; contradiction,
+         fun b hb eq => by subst eq; contradiction⟩
 
 theorem nodup_equiv (xs : List (RE α)) (ne : xs ≠ [])
   : ∃ (zs : List (RE α)),
@@ -313,7 +313,6 @@ theorem nodup_equiv (xs : List (RE α)) (ne : xs ≠ [])
         | z1a::z1b =>
           apply Trans (AltCong Rfl (toSum_append (cons_ne_nil z1a z1b)
                       (by simp only [ne_eq, reduceCtorEq, not_false_eq_true])))
-          simp only [toSum, append_eq]
           apply Trans (Sym Assoc)
           apply Trans (Sym Assoc)
           apply Trans (AltCong Assoc Rfl)
@@ -322,7 +321,7 @@ theorem nodup_equiv (xs : List (RE α)) (ne : xs ≠ [])
             reduceCtorEq, not_false_eq_true])))) Rfl
     . exact ⟨x :: zs,by simp only [nodup_cons]; exact ⟨h,nd⟩,by simp only [ne_eq, reduceCtorEq, not_false_eq_true],
              by simp only [cons_subset, mem_cons, true_or, true_and]; apply subset_cons_of_subset x fs1,
-                toSum_alt_cong (cons_ne_nil x1 xs) sb Rfl fs2⟩
+             toSum_alt_cong (cons_ne_nil x1 xs) sb Rfl fs2⟩
 
 theorem toSumnodup_equiv {xs ys : List (RE α)}
   (ne : xs ≠ []) (h : xs ⊆[ (· ≅ ·) ] ys)

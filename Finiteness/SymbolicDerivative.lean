@@ -16,15 +16,11 @@ which collects the leaves (states) of a transition tree.
 /-- The symbolic derivative operation on regexes. -/
 @[simp]
 def derivative : RE α → TTerm (RE α) (RE α)
-  | ε         => Leaf (Pred ⊥)
-  | ?= _      => Leaf (Pred ⊥)
-  | ?! _      => Leaf (Pred ⊥)
-  | ?<= _     => Leaf (Pred ⊥)
-  | ?<! _     => Leaf (Pred ⊥)
+  | ε | ?= _ | ?! _ | ?<= _ | ?<! _  => Leaf (Pred ⊥)
   | Pred φ    => Node (?= (Pred φ)) (Leaf ε) (Leaf (Pred ⊥))
   | l ⋓ r     => lift_binary (· ⋓ ·) (derivative l) (derivative r)
   | l ⋒ r     => lift_binary (· ⋒ ·) (derivative l) (derivative r)
-  | r *       => lift_unary (· ⬝ r*) (derivative r)
+  | .Star r   => lift_unary (· ⬝ r*) (derivative r)
   | ~ r       => lift_unary (~ ·) (derivative r)
   | l ⬝ r     =>
     Node l
@@ -59,7 +55,7 @@ theorem step_concatenation (r s : RE α) :
   ++ leaves (lift_unary (· ⬝ s) (𝜕 r)) := by
   simp only [step, derivative, leaves, leaves_binary, productWith, leaves_unary]
 
-/-- Take n steps in r (iterate the symbolic derivative and collect the leaves). -/
+/-- Take `n` steps in `r` (iterate the symbolic derivative and collect the leaves). -/
 @[simp]
 def steps (r : RE α) : ℕ → List (RE α)
   | 0 => [r]

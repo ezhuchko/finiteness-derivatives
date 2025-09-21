@@ -1,4 +1,4 @@
-import Regex.Definitions
+import Finiteness.Finite
 import Finiteness.Simplifications
 
 open TTerm String RE BA List
@@ -28,7 +28,7 @@ instance [ToString α] : ToString (RE α) where
     | r1 ⋒ r2 => "(" ++ toStringRE r1 ++ " & " ++ toStringRE r2 ++ ")"
     | r1 ⬝ r2 => "(" ++ toStringRE r1 ++ "⬝" ++ toStringRE r2 ++ ")"
     | ~ r     => "~" ++ toStringRE r
-    | r *     => toStringRE r ++ "*"
+    | .Star r => toStringRE r ++ "*"
 
 def addBranch (empty : Bool) (l : (String × List String)) : List String :=
   match l with
@@ -57,7 +57,7 @@ def ppRE (r : RE (BA Char)) : List String :=
   | r1 ⋒ r2 => ppTree "&" [("l",ppRE r1), ("r",ppRE r2)]
   | r1 ⬝ r2 => ppTreeNameless "·" [ppRE r1, ppRE r2]
   | ~ r     => ppTreeNameless "~" [ppRE r]
-  | r *     => ppTreeNameless "*" [ppRE r]
+  | .Star r => ppTreeNameless "*" [ppRE r]
 
 def ppTR' : TTerm (RE (BA Char)) (RE (BA Char)) → List String
   | Leaf r     => [toString r]

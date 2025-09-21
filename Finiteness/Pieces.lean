@@ -24,7 +24,7 @@ def pieces : RE α → List (RE α)
   | l ⋓ r     => pieces l ++ pieces r
   | l ⋒ r     => productWith (· ⋒ ·) ⊕(pieces l) ⊕(pieces r)
   | l ⬝ r     => map (· ⬝ r) ⊕(pieces l) ++ pieces r
-  | r *       => r* :: map (· ⬝ r*) ⊕(pieces r)
+  | .Star r   => r* :: map (· ⬝ r*) ⊕(pieces r)
   | ~ r       => map (~ ·) ⊕(pieces r)
 
 theorem topmost_not_union {r x y : RE α} : ¬ ((x ⋓ y) ∈ pieces r) := fun h =>
@@ -44,7 +44,7 @@ theorem topmost_not_union {r x y : RE α} : ¬ ((x ⋓ y) ∈ pieces r) := fun h
   | l ⬝ r     => by
     simp only [pieces, mem_append, mem_map, reduceCtorEq, and_false, exists_false, false_or] at h
     exact topmost_not_union h
-  | r *       => by simp only [pieces, mem_cons, reduceCtorEq, mem_map, and_false, exists_false, or_self] at h
+  | .Star r   => by simp only [pieces, mem_cons, reduceCtorEq, mem_map, and_false, exists_false, or_self] at h
   | ~ r       => by simp only [pieces, mem_map, reduceCtorEq, and_false, exists_false] at h
 
 theorem pieces_refl {r : RE α} :
@@ -71,7 +71,7 @@ theorem pieces_refl {r : RE α} :
                                 exact ⟨mem_map.mpr ⟨i1,neSubsets_characterization.mpr ⟨i1,i2,Perm.refl _⟩,rfl⟩,
                                        mem_map.mpr ⟨j1,neSubsets_characterization.mpr ⟨j1,j2,Perm.refl _⟩,rfl⟩⟩),
                             InterCong i3 j3⟩
-  | r *       => ⟨[r*],mem_of_mem_head? rfl,Rfl⟩
+  | .Star r   => ⟨[r*],mem_of_mem_head? rfl,Rfl⟩
   | ~ r       => by
     have ⟨i1,i2,i3⟩ := pieces_refl (r:=r)
     simp only [pieces, toSumSubsets, neSubsets, map_flatten, map_map]
@@ -157,7 +157,7 @@ theorem pieces_equiv' [DecidableEq α] {f f' : RE α} (eqv : f ≅ f') :
             | Or.inl ⟨xs,g1,g2⟩ =>
               subst g2; rename_i r1 r2
               have ⟨i1,i2,i3⟩ := toSumSubsets_monotone ih.1 _ g1
-              exact ⟨i1 ⬝ r2,CatCong i2,by simp only [pieces, mem_append, mem_map, exists_eq_right]; exact Or.inl ⟨i1,i3,rfl⟩⟩
+              exact ⟨i1 ⬝ r2,CatCong i2,by simp only [pieces, mem_append, mem_map]; exact Or.inl ⟨i1,i3,rfl⟩⟩
             | Or.inr g =>  exact ⟨e,Rfl,mem_append.mpr $ Or.inr g⟩,
             fun e h1 => by
             simp only [pieces, mem_append, mem_map] at h1
@@ -165,7 +165,7 @@ theorem pieces_equiv' [DecidableEq α] {f f' : RE α} (eqv : f ≅ f') :
             | Or.inl ⟨xs,g1,g2⟩ =>
               subst g2; rename_i r1 g _ r2
               have ⟨i1,i2,i3⟩ := toSumSubsets_monotone ih.2 _ g1
-              exact ⟨i1 ⬝ r2,CatCong i2,by simp only [pieces, mem_append, mem_map, exists_eq_right]; exact Or.inl ⟨i1,i3,rfl⟩⟩
+              exact ⟨i1 ⬝ r2,CatCong i2,by simp only [pieces, mem_append, mem_map]; exact Or.inl ⟨i1,i3,rfl⟩⟩
             | Or.inr g => exact ⟨e,Rfl,mem_append.mpr $ Or.inr g⟩⟩
   | InterCong _ _ ih1 ih2 =>
      exact ⟨fun e h1 => by
@@ -175,14 +175,14 @@ theorem pieces_equiv' [DecidableEq α] {f f' : RE α} (eqv : f ≅ f') :
             have ⟨i1,i2,i3⟩ := toSumSubsets_monotone ih1.1 _ c
             have ⟨j1,j2,j3⟩ := toSumSubsets_monotone ih2.1 _ d
             exact ⟨i1 ⋒ j1,InterCong i2 j2,by simp only [pieces, productWith, mem_map,
-              Prod.exists, pair_mem_product, exists_eq_right_right, exists_eq_right]; exact ⟨i1,j1,⟨i3,j3⟩,rfl⟩⟩,
+              Prod.exists, pair_mem_product]; exact ⟨i1,j1,⟨i3,j3⟩,rfl⟩⟩,
             fun e h1 => by
             simp only [pieces, productWith, mem_map, Prod.exists, pair_mem_product] at h1
             have ⟨a,b,⟨c,d⟩,e⟩ := h1; subst e
             have ⟨i1,i2,i3⟩ := toSumSubsets_monotone ih1.2 _ c
             have ⟨j1,j2,j3⟩ := toSumSubsets_monotone ih2.2 _ d
             exact ⟨i1 ⋒ j1,InterCong i2 j2,by simp only [pieces, productWith, mem_map,
-              Prod.exists, pair_mem_product, exists_eq_right_right, exists_eq_right]; exact ⟨i1,j1,⟨i3,j3⟩,rfl⟩⟩⟩
+              Prod.exists, pair_mem_product]; exact ⟨i1,j1,⟨i3,j3⟩,rfl⟩⟩⟩
 
 /- The set of pieces respects equivalence (up to). -/
 theorem pieces_sim [DecidableEq α] {f : RE α}
@@ -304,7 +304,7 @@ theorem pieces_trans' [DecidableEq α] {e : RE α}
     have mon := toSumSubsets_monotone this
     have ⟨m1,m2,m3⟩ := mon (toSum as) (mem_map.mpr ⟨as, neSubsets_refl ne_as,rfl⟩)
     exact ⟨~m1,NegCong m2,⟨m1,m3,rfl⟩⟩
-  | r * =>
+  | .Star r  =>
     simp only [pieces, mem_cons, mem_map] at h2
     match h2 with
     | Or.inl g =>

@@ -104,7 +104,7 @@ theorem leaves_fmap : leaves (fmap op g) = map op (leaves g) := by
 theorem productWith_append :
   productWith op (leaves ff ++ leaves gg) (leaves g) =
   productWith op (leaves ff) (leaves g) ++ productWith op (leaves gg) (leaves g) := by
-  simp only [productWith, product, map_map, List.flatMap_append, map_append]
+  simp only [productWith, product, List.flatMap_append, map_append]
 
 @[simp]
 theorem leaves_binary (op : β → β → β) (f g : TTerm α β) :

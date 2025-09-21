@@ -1,7 +1,4 @@
 import Regex.Definitions
-import Finiteness.Evaluation
-import Finiteness.SubsetUpTo
-import Finiteness.Similarity
 import Finiteness.Permute
 
 open RE TTerm List
@@ -23,7 +20,7 @@ def asList (e : RE α) : List (RE α) :=
 @[simp]
 def basic (e : RE α) : Prop :=
   match e with
-  | ε | Pred _ | ?=_ | ?!_ | ?<=_ | ?<!_ | _ * => True
+  | ε | Pred _ | ?=_ | ?!_ | ?<=_ | ?<!_ | .Star _ => True
   | _⋒_ | ~ _ | _⬝_   => False
   | l ⋓ r => basic l ∧ basic r
 
@@ -85,7 +82,7 @@ theorem step_not_idem {a : α} :
       leaves, forall_exists_index, and_imp, Alternation.injEq, exists_eq_right_right, reduceCtorEq, or_true,
       and_true, exists_eq_right, e, b]
   have ⟨y, y_eq, y_mem⟩ := h (e ⋓ b) eb_in
-  simp only [step, derivative, leaves, cons_append, nil_append, mem_cons, not_mem_nil, or_false, b, e] at y_mem
+  simp only [step, derivative, leaves, cons_append, nil_append, mem_cons, not_mem_nil, or_false] at y_mem
   match y_mem with
   | Or.inl q => subst q; apply eps_bot_not_eps y_eq
   | Or.inr q => subst q; apply eps_bot_not_bot y_eq

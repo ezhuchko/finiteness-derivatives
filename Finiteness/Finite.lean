@@ -53,7 +53,7 @@ theorem step_to_pieces {e : RE α} (e_in : e ∈ step f) :
       have ⟨i1,i2,i3⟩ := step_to_pieces a2
       let ⟨a,ha,ha1⟩ := neSubsets_characterization.mp i3
       exact ⟨[(toSum i1) ⬝ r],CatCong i2, neSubsets_singleton $ mem_append.mpr $ Or.inl $ mem_map.mpr ⟨toSum i1,mem_map.mpr ⟨i1,i3,rfl⟩,rfl⟩⟩
-  | r* =>
+  | .Star r =>
     simp only [step, derivative, leaves_unary, mem_map] at e_in
     let ⟨a1,a2,a4⟩ := e_in
     subst a4
@@ -77,7 +77,6 @@ theorem step_to_pieces {e : RE α} (e_in : e ∈ step f) :
             neSubsets_singleton (by unfold pieces productWith product
                                     simp only [mem_map, mem_flatMap, exists_exists_and_exists_and_eq_and,
                                       Function.uncurry_apply_pair, Intersection.injEq, exists_eq_right_right];
-                                    unfold toSumSubsets
                                     exact ⟨mem_map.mpr ⟨i1,i3,rfl⟩,mem_map.mpr ⟨j1,j3,rfl⟩⟩)⟩
   | ~ r =>
     simp only [step, derivative, leaves_unary, mem_map] at e_in
@@ -125,7 +124,7 @@ theorem finiteness_piecesS [DecidableEq α] {r : RE α}:
       ⟨toSum xs,Sym h1,mem_map.mpr ⟨xs,h2,rfl⟩⟩
     have ⟨_,g_equiv,g_piece⟩ : re ∈[(· ≅ ·)] piecesS (steps r n) :=
       ⟨f,f_equiv,
-       by simp only [piecesS, map_flatten, map_map, mem_flatten, mem_map, exists_exists_and_eq_and]
+       by simp only [piecesS, mem_flatten, mem_map, exists_exists_and_eq_and]
           exists e⟩
     have step1 := piecesS_monotone (finiteness_piecesS (r:=r) (n:=n))
     have step2 := piecesS_idem (xs:= [r])

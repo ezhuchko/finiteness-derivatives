@@ -44,13 +44,12 @@ theorem subset_up_to_sim_cons (xs : List (RE α)) :
   xs ⊆[ (· ≅ ·) ] (x::xs) :=
   match xs with
   | [] => subset_to_subset_up_to_sim (List.nil_subset [x])
-  | y::ys => by
-    intro a ha
+  | y::ys => fun a ha =>
     match List.mem_cons.mp ha with
-    | Or.inl g1 => subst g1; exact ⟨a,Rfl,List.mem_cons_of_mem x ha⟩
+    | Or.inl _ => ⟨a,Rfl,List.mem_cons_of_mem x ha⟩
     | Or.inr g1 =>
       have ⟨i1,i2,i3⟩ := (subset_up_to_sim_cons (x:=y) ys) a g1
-      exact ⟨i1,i2,List.mem_cons_of_mem x i3⟩
+      ⟨i1,i2,List.mem_cons_of_mem x i3⟩
 
 theorem subset_up_to_sim_of_cons_subset {c : RE α} (h : (c :: cs) ⊆[ (· ≅ ·) ] ys) :
   cs ⊆[ (· ≅ ·) ] ys := subset_up_to_trans_sim (subset_up_to_sim_cons cs) h
